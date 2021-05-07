@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/inquiry")
@@ -15,19 +16,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class InquiryController {
 
 	@GetMapping("/form")
-	public String from(InquiryForm inquiryForm, Model model) {
+	public String form(InquiryForm inquiryForm,
+			Model model,
+			@ModelAttribute("complete") String complete) {
 		model.addAttribute("title", "Inquiry Form");
 		return "inquiry/form";
 	}
 
 	@PostMapping("/form")
-	public String fromGoBack(InquiryForm inquiryForm, Model model) {
+	public String formGoBack(InquiryForm inquiryForm, Model model) {
 		model.addAttribute("title", "Inquiry Form");
 		return "inquiry/form";
 	}
 
 	@PostMapping("/confirm")
-	public String confirm(@ModelAttribute @Validated InquiryForm inquiryForm,
+	public String confirm(@Validated InquiryForm inquiryForm,
 			BindingResult result,
 			Model model) {
 		if(result.hasErrors()) {
@@ -39,4 +42,19 @@ public class InquiryController {
 		return "inquiry/confirm";
 
 	}
+
+	@PostMapping("/complete")
+	public String complete(@Validated InquiryForm inquiryForm,
+			BindingResult result,
+			Model model,
+			RedirectAttributes redirectAttributes) {
+		if(result.hasErrors()) {
+			model.addAttribute("title", "InquiryForm");
+			return "inquiry/form";
+
+		}
+		redirectAttributes.addFlashAttribute("complete", "Registered!");
+		return "redirect:/inquiry/form";
+	}
+
 }
